@@ -1,0 +1,163 @@
+# Podemos poner comentarios en YAML
+# En un fichero YAML puede haber muchos documentos YAML
+# Cada documento va precedido del signo:
+...
+---
+# Salvo el primero.
+# Rara vez, vereis el simbolo 
+... # eso significa fin de documento. Es opcional. 
+# Segundo: ese símbolo tiene sentido si transmito ficheros por red, en un socket
+---
+# Un documento YAML Es UN NODO
+# 2 tipos de nodos existen en YAML:
+# - Escalares: Un único valor
+# - De colección
+...
+---
+# Escalares:
+# Número:
+398754678
+...
+--- # No es válido... tengo 3 nodos... solo puedo tener 1
+3.14
+-9
+.inf # .INF .Inf .nan .NAN .Nan
+---
+# Valores lógicos:
+True 
+true
+TRUE
+false
+FALSE
+False
+---
+# OJO, IMPORTANTISISISISISISISISISISMO !!!!!
+# Todos estos ANTES (version 1.0 y 1.1 de YAML) eran tratados como valores lógicos también
+# En versión actal de YAML 1.2, se han eliminado.
+# La mayor parte de parsers (analizador sintactico de un lenguaje) de YAML, siguen soportando estos valores... por compatibilidad...
+# CUIDADO , en cualquier momento me lo quitan
+Yes
+yes
+YES
+No
+no
+NO
+On
+on
+ON
+Off
+off
+OFF
+y
+n
+Y
+N
+---
+# Texto
+h"o'la # amigo
+---
+"h\"o'la # am\\igo\n\t."
+---
+'h"o''la # am\igo\n\t.'
+---
+# Otras 2 formas de escribir texto
+# Literal |
+# Se para el texto literalmente, sin cmabiar ni una coma...
+# Pero se eliminan los sangrados... Teniendo en cuenta el sangrado 
+# de la primera linea
+# +: Manten todos los saltos de line finales
+# -: No pongas ni un salto de linea al final
+# Si no pongo ni +, ni -: Siempre se devuelve 1 salto de linea
+# Un numero detras del | significa el número de blancos que hay que eliminar del sangrado
+
+|3-
+    Esta es la linea 1
+     Esta es la linea 2
+    
+    Esta es la cuarta   linea# \"'
+
+
+
+
+---
+# Folded. Super util... por ejemplo para escribir un comando de la sh
+>
+    Esta es la linea 1 
+     Esta es la linea 2 
+    
+    Esta es la cuarta   linea# \"'
+---
+# Nodos de colección: Agrupan otros tipo de nodos
+# Listas ordenadas
+# 2 sintaxis:
+[1,2,3]   # JSON, PYTHON
+---
+- 1
+- True
+- Hola
+-
+    - Subitem 1
+    - Subitem 2 # La jerarquía  se identifica mediante el sangrado (Tabulación)
+-
+        - Subitem 1
+        - Subitem 2 # La jerarquía  se identifica mediante el sangrado (Tabulación)
+- Item 5
+# En YAML puedo usar lo que me de la gana para sangrar.
+# SOLO ME EXIGE SER CONSISTENTE EN CADA NIVEL
+---
+# Mapas desordenados 
+# Colección de valores, igual que una lista... donde:
+# Cada elemento, en lugar de identificarse por su posición en la lista
+# Se identifica a través de una clave. 
+# Colección de clave-valor
+clave1: 1
+clave2: True
+clave3: Hola
+---
+clave2: True
+clave1: 1
+clave3: Hola
+---
+? clave3: Hola
+clave2: True
+clave1: 1
+clave4:
+                        - lista 1
+                        - lista 2
+clave 5:
+    subclave1: Hola
+    subclave2: Adios!!!
+? - dato 1
+  - dato 2
+:
+    mapa1: valor7
+    mapa2: valor 5
+---
+# Anchors de YAML
+
+usuario: &ivan
+    nombre: Ivan
+    apellido: &apellido Osuna
+    edad: 43
+
+empleados:
+    - nombre: Lucas
+      apellido: Ortiz
+      edad: 22
+    - *ivan
+    - nombre: Maria
+      apellido: *apellido
+      edad: 33
+    - 
+        contraseña: password
+        email: ivan.osuna.ayuste@gmail.com
+        <<: *ivan
+        #nombre: Ivan
+        #apellido: &apellido Osuna
+        #edad: 43
+---
+# Cuando trabajamos en YAML, YAML usa el concepto de ESQUEMA:
+# Conjunto de etiquetas que puedo usar y su jerarquia... y los tipos de datos
+
+# Ansible tiene su propio esquema YAML
+# Kubernetes tiene su propio esquema YAML

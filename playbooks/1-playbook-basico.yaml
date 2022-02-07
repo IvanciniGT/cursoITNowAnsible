@@ -1,0 +1,22 @@
+# Playbook
+-
+    # Entornos en los que voy a ejectar este playbook
+    hosts: all # mipc localhost
+    # Esto es por defecto
+    # gather_facts: True
+    #...
+    tasks:
+        - # Un item para cada tarea. Y para cada una, tenemos que definir:
+            name: Soy la primera tarea del playbook
+            # Decir que módulo ejecuta esta tarea:
+            debug:
+                msg: Hola, estamos comenzando con Ansible
+
+        -   name: Soy la segunda tarea del playbook
+            # Decir que módulo ejecuta esta tarea:
+            debug:
+                msg: Hola, seguimos con Ansible
+                
+        -   debug:
+                msg: Adios, por hoy acabamos !!!!!
+            name: Soy la tercera tarea del playbook                    

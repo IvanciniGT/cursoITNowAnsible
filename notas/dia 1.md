@@ -285,6 +285,7 @@ repo local              repo local          repo local
 Elena e Iñaki, la primera vez usarian el comando git clone
 
 
+## POR FIN... ivan va a dejar de enrollarse y empieza con un playbook de ansible. ya era hora !!!!
 # Instalación ansible
 # Intento de Playbook 
 # Intento de inventario

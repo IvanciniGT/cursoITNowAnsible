@@ -144,7 +144,7 @@ En esa carpeta quiero la ultima version de este repo de git. Haz lo que necesite
 ## Nodos gestionados. Entornos a los ANSIBLE (desde el nodo de control) accede para hacer tareas en ellos
 
 ## Módulos:
-    - Unidades de códugo que ansible ejecuta en los nodos gestionados.
+    - Unidades de código que ansible ejecuta en los nodos gestionados.
     - Cada módulo tiene un uso particular:
         - Gestión de usuarios: LINUX
         - Gestión de usuarios: WINDOWS
@@ -264,7 +264,7 @@ Estados de un fichero dentro de git:
 - Untracked: No está siendo controlado por git
 - Modified:  El fichero está siendo controlado por git y ha cambiado desde la ultima versión que git guardo en un commit.
 - Unmodified: El fichero esta controlado por git, y en él no hay cambios desde la ultima foto que git tomó
-- 
+
 
 master                                           C7--------------
                                                 /

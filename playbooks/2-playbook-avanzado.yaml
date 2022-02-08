@@ -1,0 +1,109 @@
+# Playbook: Contiene PLAYS
+
+# Para ejecutar este paybook :
+# $ ansible-playbook PATH_PLAYBOOK -i PATH_INVENTORY
+
+- # Definición de UN PLAY
+
+    # Entornos en los que voy a ejectar este playbook.
+    hosts: all  # mipc localhost
+                # Buena práctica poner aquí all. Por qué?
+                #   Me interesa limitar esto cuando ejecute el playbook. Flexibilidad.
+                # Valores posibles:
+                #  - all: Todos los del inventario
+                #  - nombre de host: localhost, mipc
+                #  - rangos de maquinas: server1:server10
+                #  - grupo: Los hosts (entornos) en los inventarios se pueden clasificar por grupos. Los que yo quiera.
+                #           "produccion". "base_de_datos" "cliente1"
+                #  - combinaciones de grupos:
+                #       webservers:&produccion     Todos los webserves que SI sean de produccion 
+                #       webservers:!produccion     Todos los webserves que NO sean de produccion 
+    
+    # Orden en el que deben elegirse los hosts (entornos) sobre los que ir ejecutando este PLAY
+    order: inventory #                      Segun vengan en el inventario
+                     # reversed_inventory:  Ordenados según inventario pero del ultimo al primero
+                     # sorted:              Ordenados alfabeticamente
+                     # reversed_sorted:     Ordenados alfabeticamente pero del ultimo al primero
+                     # shuffle:             Como te venga bien
+        
+    # Indicamos a ansible si lo primero que hago al conectarme con un entorno es recuperar su FACTS:
+    # Existe 2 tipos de facts, sobre los que este comando opera:
+    #   Facts genericos que ofrece ansible: Información del HW y software del entorno al que me conecto
+    #   Custom facts: Datos que yo puedo generar /almacenar en los entornos remotos
+    gather_facts: True # Valor por defecto
+    # Los facts genericos de ansible, que se recuperen, se podrán consultar a través de la variable: "ansible_facts"
+    
+    # Variables propias de este playbook:
+    # Ansible tiene más de 20 sitios diferentes donde definir variables. ES UNA LOCURA !!!!!!!
+    # Util... más para mi, que estoy montando el playbook... Datos que vaya a utilizar por ahí abajo con frecuencia
+    #         O que sepa yo que es facil que cambien en un futuro... Me los pongo aqui, que los tengo más controlados
+    # Este bloque, más que para definir variables, lo usamos para definir CONSTANTES
+    vars:
+        # Aqui pongo lo que me de la real gana.... con estructura de MAPA YAML
+        variable1: valor 1
+        variable2: 33
+        variable3: True
+        variable4:
+            - item 1
+            - item 2
+            - item 3
+        variable5: 
+            dato1: valor1
+            dato2: valor2
+            dato3: valor3
+            
+        apache:
+            rutaHome: /var/apache/home
+            puertos:
+                - 80
+                - 443
+            ssl:
+                enabled: True
+                privateKeyFile: /etc/apache/security/privateKey.pm
+                certFile: /etc/apache/security/cert.pem
+
+    # Definir TAREAS / ESTADOS
+    # Agrupación a nivel conceptual. Estructurar mi fichero. A mi como ser humano PENSANTE me viene bien
+    #pretasks:
+    #    Dependencias
+    #tasks:
+    #    Creo usuarios
+    #    Instalo el apache
+    #posttasks:
+    #    Abro puertos
+    
+    # Orden de ejecución de tareas en un playbook
+    # 1º Se ejecutan los pretasks
+    # 2º Se ejecutan UNA UNICA VEZ las tareas definidas en HANDLERS que hayan sido activadas
+    # 3º Se ejecutan los tasks
+    # 4º Se ejecutan UNA UNICA VEZ las tareas definidas en HANDLERS que hayan sido activadas
+    # 5º Se ejecutan los posttasks
+    # 6º Se ejecutan UNA UNICA VEZ las tareas definidas en HANDLERS que hayan sido activadas
+    # Hay una palabra (QUE NO SE RECOMIENDA USAR) que permite en medio de un bloque PRE, TASKS o POST forzar la ejecución 
+    # de los handlers que hayan sido notificados hasta ese momento flush_handlers
+    
+    tasks:
+        - # Un item para cada tarea. Y para cada una, tenemos que definir:
+            name: Soy la primera tarea del playbook
+            # Decir que módulo ejecuta esta tarea:
+            debug:
+                msg: Hola, estamos comenzando con Ansible
+
+        -   name: Soy la segunda tarea del playbook
+            # Decir que módulo ejecuta esta tarea:
+            debug:
+                msg: Hola, seguimos con Ansible
+
+        -   debug:
+                msg: Adios, por hoy acabamos !!!!!
+            name: Soy la tercera tarea del playbook                    
+    
+    # Otras tareas, asociadas a EVENTOS
+    # Las tareas definidas en pretasks, tasks y posttasks siempre se ejecutan (a priori).
+    # Las que pongamos aquí SOLO cuando hayan sido ACTIVADAS por una tarea de las anteriores
+    # Los handlers se ejecutan despues de habese ejecutado todas las tareas de un bloque de tareas: pre, tasks, post
+    #handlers:
+    
+    
+    
+

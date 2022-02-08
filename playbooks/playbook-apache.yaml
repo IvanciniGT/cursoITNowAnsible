@@ -1,0 +1,123 @@
+-   hosts: all
+    gather_facts: False
+    vars: 
+        apache:                 # De serie ponemos un nivel de agrupación: BUENA PRACTICA !!!!!
+            user:                   apache
+            virtualhosts:           [] # Una lista vacia
+                # -   domain:
+                #     documentRoot: 
+                #     ports:
+                #         -
+                #     app:
+            dependencies:           [] # Estas me las da el usuario
+            base_dependecies:          # Estas las requier mi playbook
+                - a2enmod
+                - a2dismod
+            modules:                []
+                
+    pretasks:
+        -   name: Obtener información del entorno
+            # Decir que módulo ejecuta esta tarea:
+            setup:
+                gather_subset:
+                  - '!all'
+
+        -   name: Instalaciones Previas en Ubuntu/Debian
+            block:
+            -   name: Asegurar que está instalado el software necesario para el playbook en Debian/Ubuntu
+                    # {{ item }}
+                loop: "{{ base_dependecies }}"
+            -   name: Asegurar que está instalado el software necesario para las apps que ponga en apache en Debian/Ubuntu
+                    # {{ item }}
+                loop: "{{ dependencies }}"
+            when: ansible_facts.os_family == "Debian"
+            
+        -   name: Instalaciones Previas en RHEL/CentOS
+            block:
+            -   name: Asegurar que está instalado el software necesario para el playbook en RHEL/CentOS
+                    # {{ item }}
+                loop: "{{ base_dependecies }}"
+            -   name: Asegurar que está instalado el software necesario para las apps que ponga en apache en RHEL/CentOS
+                    # {{ item }}
+                loop: "{{ dependencies }}"
+            when: ansible_facts.os_family == "Redhat"
+
+    tasks:                                      
+        -   name: Asegurar que apache quede instalado en Debian y derivados # Ian Deborah
+            when: ansible_facts.os_family == "Debian"
+            
+        -   name: Asegurar que apache quede instalado en Redhay y derivados
+            when: ansible_facts.os_family == "Redhat"
+
+        -   name: Asegurar que están instalados los modulos requeridos de apache #modules
+                # {{ item }}
+            loop: "{{ modules }}"
+            notify: REINICIO_REQUERIDO
+        -   name: Asegurar que apache quede configurado como yo quiero
+            notify: REINICIO_REQUERIDO
+        -   name: Asegurarme que mi app quede instalada #documentRoot
+                # {{ item }}
+            loop: "{{ virtualhosts }}"
+            notify: REINICIO_REQUERIDO
+        -   name: Asegurar que están los virtual host que quiero #documentRoot
+                # {{ item }}
+            loop: "{{ virtualhosts }}"
+            notify: REINICIO_REQUERIDO
+        -   name: Asegurar que apache tiene su servicio
+        -   name: Asegurar que apache tiene su servicio configurado para arranque automatico
+        -   name: Asegurar que apache tiene su servicio corriendo # START
+            register: estado_servicio # Sustantivo
+        -   name: Asegurar que los puertos del apache quedan abiertos en el firewall local
+                # {{ item.ports }}
+            loop: "{{ virtualhosts }}"
+    posttasks:
+        -   name: "Test: Hay corriendo un proceso de apache?"
+        -   name: "Test: Esta abierto el puerto que quiero?"
+                # {{ item.ports }}
+            loop: "{{ virtualhosts }}"
+        -   name: "Test: Puedo acceder a mi app por el protocolo y url adecuado"
+                # {{ item }}
+            loop: "{{ virtualhosts }}"
+    handlers:
+        -   name: Asegurar que si hay cambios, el servicio es reiniciado (si no he iniciado con un start)
+            listen: REINICIO_REQUERIDO
+            when: estado_servicio is not changed # Si no he INICIADO el servicio previamente
+            
+            
+    # Simulacro de haceresto mismo sin handler
+
+#    pretasks:
+#        -   name: Asegurar que está instalado el software necesario para las apps que ponga en apache # dependencies 
+#    tasks:                                      
+#        -   name: Asegurar que apache quede instalado
+#        -   name: Asegurar que están instalados los modulos requeridos de apache #modules
+#            register: instalacion de modulos
+#        -   name: Asegurar que apache quede configurado como yo quiero
+#            register: configuracion_apache
+#        -   name: Asegurarme que mi app quede instalada #documentRoot
+#            register: instalacion_app
+#        -   name: Asegurar que están los virtual host que quiero #documentRoot
+#            register: virtualhost_configurados
+#        -   name: Tarea nueva que requiere reinicio #documentRoot
+#            register: nueva_tarea
+#        -   name: Asegurar que apache tiene su servicio
+#        -   name: Asegurar que apache tiene su servicio configurado para arranque automatico#
+
+#        -   name: Asegurar que apache tiene su servicio corriendo # START
+#            register: iniciar_servicio
+
+#        -   name: Asegurar que si hay cambios, el servicio es reiniciado (si no he iniciado con un start)
+#            when: >
+#                    iniciar_servicio is not changed and (
+#                        instalacion_modulos is changed or 
+#                        configuracion_apache is changed or 
+#                        instalacion_app is changed or 
+#                        nueva_tarea is changed or 
+#                        virtualhost_configurados is changed
+#                    )
+
+#        -   name: Asegurar que los puertos del apache quedan abiertos en el firewall local
+#    posttasks:
+#        -   name: "Test: Hay corriendo un proceso de apache?"
+#        -   name: "Test: Esta abierto el puerto que quiero?"
+#        -   name: "Test: Puedo acceder a mi app por el protocolo y url adecuado"

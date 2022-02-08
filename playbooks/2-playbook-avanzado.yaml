@@ -30,7 +30,7 @@
     # Existe 2 tipos de facts, sobre los que este comando opera:
     #   Facts genericos que ofrece ansible: Información del HW y software del entorno al que me conecto
     #   Custom facts: Datos que yo puedo generar /almacenar en los entornos remotos
-    gather_facts: True # Valor por defecto
+    gather_facts: False # Valor por defecto
     # Los facts genericos de ansible, que se recuperen, se podrán consultar a través de la variable: "ansible_facts"
     
     # Variables propias de este playbook:
@@ -84,25 +84,94 @@
     
     tasks:
         - # Un item para cada tarea. Y para cada una, tenemos que definir:
-            name: Soy la primera tarea del playbook
+            name: Tarea -1. Recuperar facts... pero pocos
+            # Decir que módulo ejecuta esta tarea:
+            setup:
+                gather_subset:
+                  - '!all'
+
+        - # Un item para cada tarea. Y para cada una, tenemos que definir:
+            name: Tarea 0. Mostrar lo facts de la maquina contra la que estoy trabajando
+            # Decir que módulo ejecuta esta tarea:
+            debug:
+                var: ansible_facts 
+
+
+        - # Un item para cada tarea. Y para cada una, tenemos que definir:
+            name: Tarea 1
             # Decir que módulo ejecuta esta tarea:
             debug:
                 msg: Hola, estamos comenzando con Ansible
 
-        -   name: Soy la segunda tarea del playbook
+        -   name: Tarea 2
             # Decir que módulo ejecuta esta tarea:
+            shell: |
+                    if [ -d /tmp/prueba ]; then
+                        exit 0
+                    else
+                        mkdir /tmp/prueba && exit 2 || exit 1
+                    fi
+            notify: EVENTO_Y
+            register: salida_tarea_2 # Me crea una variable que almacena la salida del MODULO
+                # Cuando registro la salida de un módulo, con independencia de lo que devuelva el modulo,
+                # Siempre puedo preguntar:
+                #    salida_tarea_2 is failed
+                #    salida_tarea_2 is succeded
+                #    salida_tarea_2 is changed
+                #    salida_tarea_2 is skipped
+            changed_when: salida_tarea_2.rc == 2 # Expresión lógica
+            failed_when: salida_tarea_2.rc == 1  # Expresión lógica
+            #ignore_errors: True # Expresión lógica
+        
+        # Condicional
+        -   name: Mostrar datos de la tarea 2
             debug:
-                msg: Hola, seguimos con Ansible
+                var: salida_tarea_2.rc
+            when: salida_tarea_2.rc == 2 # Expresión lógica
 
+        -   meta: flush_handlers    # Fuerza que los handles notificados hasta el momento se ejecuten en este punto
+                                    # No es buena práctica. Lo usaré si no me queda otra
         -   debug:
                 msg: Adios, por hoy acabamos !!!!!
-            name: Soy la tercera tarea del playbook                    
+            name: Tarea 3             
+            notify: Otra tarea 1  # ESTO NO SE USA !!!!!!
+                    # Cuando se ejecutaría esta tarea? Al final de todos los tasks y solo una vez
+                    # Siempre? NO. Solo si esta tarea provoca CAMBIO: change
+        # Bucles
+        -   name: Ejecuto una tarea en bucle
+            shell:
+                cmd: |
+                    # Interpolación de variables en textos
+                    echo {{ item | upper }}
+                    {{ item }}
+            register: bucle
+            loop: "{{ comandos }}"
+            vars: 
+                comandos: 
+                    - echo HOLA
+                    - echo Adios
+
+        -   name: Mostrar ejecucion bucle
+            debug:
+                var: bucle
     
     # Otras tareas, asociadas a EVENTOS
     # Las tareas definidas en pretasks, tasks y posttasks siempre se ejecutan (a priori).
     # Las que pongamos aquí SOLO cuando hayan sido ACTIVADAS por una tarea de las anteriores
     # Los handlers se ejecutan despues de habese ejecutado todas las tareas de un bloque de tareas: pre, tasks, post
-    #handlers:
+    handlers:
+        -   name: Otra tarea 1
+            debug:
+                msg: Adios, por hoy acabamos !!!!!
+            listen: # Una o la otra
+                -   EVENTO_X
+                -   EVENTO_Y
+            
+        -   name: Otra tarea 2
+            debug:
+                msg: Adios, por hoy acabamos !!!!!
+            listen: EVENTO_X
+            
     
     
     

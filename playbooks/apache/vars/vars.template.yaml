@@ -7,6 +7,14 @@ apache:
                             - 80
             app:            https://github.com/IvanciniGT/webEjemploAnsible
     dependencies:           
-                            - php
+                            - # Es una dependencia
+                                name: php
+                                version: latest
+                            - # Es una dependencia
+                                name: git
+                                version: 2.17.1
+                                #repo
+                                #key
+                                #upgrade: false # Vaor por defecto
     modules:                
                             - mod_php

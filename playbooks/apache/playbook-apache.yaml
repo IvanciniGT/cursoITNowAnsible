@@ -2,26 +2,8 @@
     gather_facts: False
 
     pretasks:
-        -   name: Obtener información del entorno # Rellena la variable ansible_facts (MAPA, DICCIONARIO)
-            # Decir que módulo ejecuta esta tarea:
-            setup:
-                gather_subset:
-                  - '!all'
-            tags:
-                - mandatory
-                
-        -   name: Cargar variables internas
-            include_vars:
-                file: internal/internal-vars.yaml
-                name: apacheInternal
-            tags:
-                - mandatory
-                
-        -   name: Cargar variables por defecto
-            include_vars:
-                file: vars/vars.default.yaml
-                name: apache
-            when: apache is not defined
+        -   name: Preparación del playbook
+            include_tasks: "pre-tasks/base.yaml"
             tags:
                 - mandatory
 

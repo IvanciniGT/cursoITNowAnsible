@@ -1,0 +1,16 @@
+-   name: Obtener información del entorno # Rellena la variable ansible_facts (MAPA, DICCIONARIO)
+    # Decir que módulo ejecuta esta tarea:
+    setup:
+        gather_subset:
+          - '!all'
+
+-   name: Cargar variables internas
+    include_vars:
+        file: internal/internal-vars.yaml
+        name: apacheInternal
+
+-   name: Cargar variables por defecto
+    include_vars:
+        file: vars/vars.default.yaml
+        name: apache
+    when: apache is not defined

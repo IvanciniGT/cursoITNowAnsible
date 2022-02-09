@@ -1,7 +1,0 @@
--   name: Asegurar que está instalado el software necesario para el playbook en Debian/Ubuntu
-        # {{ item }}
-    loop: "{{ apacheInternal.baseDependecies }}"
-
--   name: Asegurar que está instalado el software necesario para las apps que ponga en apache en Debian/Ubuntu
-        # {{ item }}
-    loop: "{{ apache.dependencies | default( [] ) }}"

@@ -4,4 +4,4 @@
     
 -   name: Asegurar que está instalado el software necesario para las apps que ponga en apache en RHEL/CentOS
         # {{ item }}
-    loop: "{{ dependencies }}"
+    loop: "{{ dependencies | default( [] ) }}"

@@ -4,4 +4,4 @@
 
 -   name: Asegurar que está instalado el software necesario para las apps que ponga en apache en Debian/Ubuntu
         # {{ item }}
-    loop: "{{ dependencies }}"
+    loop: "{{ apache.dependencies | default( [] ) }}"

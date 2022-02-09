@@ -5,7 +5,7 @@
 
 -   name: Asegurar que están los virtual host que quiero #documentRoot
         # {{ item }}
-    loop: "{{ virtualhosts }}"
+    loop: "{{ virtualhosts | default( [] ) }}"
     notify: REINICIO_REQUERIDO
     tags:
         - configuracion
@@ -25,7 +25,7 @@
 
 -   name: Asegurar que los puertos del apache quedan abiertos en el firewall local
         # {{ item.ports }}
-    loop: "{{ virtualhosts }}"
+    loop: "{{ virtualhosts | default( [] ) }}"
     tags:
         - configuracion
     

@@ -10,7 +10,7 @@
 
 -   name: Asegurar que están instalados los modulos requeridos de apache #modules
         # {{ item }}
-    loop: "{{ apache.modules }}"
+    loop: "{{ apache.modules | default( [] )}}"
     notify: REINICIO_REQUERIDO
     tags:
         - instalacion
@@ -19,7 +19,7 @@
 
 -   name: Asegurarme que mi app quede instalada #documentRoot
         # {{ item }}
-    loop: "{{ apache.virtualhosts }}"
+    loop: "{{ apache.virtualhosts | default( [] )}}"
     notify: REINICIO_REQUERIDO
     tags:
         - instalacion

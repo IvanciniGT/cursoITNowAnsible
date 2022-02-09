@@ -1,10 +1,16 @@
 -   name: Asegurar que apache quede configurado como yo quiero
     notify: REINICIO_REQUERIDO
+    copy:
+        src: resources/httpd.conf
+        dest: "{{ apacheInternals.etcDir}}"
     tags:
         - configuracion
 
 -   name: Asegurar que están los virtual host que quiero #documentRoot
         # {{ item }}
+    template:
+        src: resources/virtualhost.conf
+        dest: "{{ apacheInternals.sitesDir}}"
     loop: "{{ virtualhosts | default( [] ) }}"
     notify: REINICIO_REQUERIDO
     tags:

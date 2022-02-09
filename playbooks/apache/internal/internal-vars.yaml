@@ -1,3 +1,5 @@
 baseDependecies:          # Estas las requier mi playbook
     - a2enmod
     - a2dismod
+etcDir: /etc/apache2
+sitesDir: /etc/apache2/sites-enabled

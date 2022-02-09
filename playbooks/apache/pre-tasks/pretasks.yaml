@@ -13,3 +13,5 @@
         update: False
     tags:
         - pre-instalacion
+#curl
+#nginx:80

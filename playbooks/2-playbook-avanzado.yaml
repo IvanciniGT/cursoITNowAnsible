@@ -163,6 +163,23 @@
         -   name: Mostrar ejecucion bucle
             debug:
                 var: bucle
+        -   block:
+                -   name: Tarea 1
+                    shell: exit 1
+            rescue:         # entra si alguna de las de arriba falló
+                -   name: Tarea 2
+                    debug: 
+                        msg: "Tarea 1"
+                -   name: Tarea 3
+                    debug: 
+                        msg: "Tarea 2"
+            always:         # entra siempre.. si hay fallos o no
+                -   name: Tarea 4
+                    debug: 
+                        msg: "Taea 1"
+                -   name: Tarea 5
+                    debug: 
+                        msg: "Tarea 2"
     
     # Otras tareas, asociadas a EVENTOS
     # Las tareas definidas en pretasks, tasks y posttasks siempre se ejecutan (a priori).

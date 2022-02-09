@@ -1,0 +1,38 @@
+-   block:
+        -   name: Asegurarme que APACHE está PARADO
+            systemd:
+                name: httpd
+                state: stopped
+                
+        -   name: Backup de la app antigua, si existe. Y quitarla
+            archive:
+                dest: /tmp/app.tgz
+                path: "{{ item.documentRoot }}"
+                remove: True
+                
+        -   name: Clonado del git de la app donde debe.
+            git: 
+                repo: "{{ item.appRepo }}"
+                dest: "{{ item.documentRoot }}"
+                depth: 1
+                
+        -   name: Eliminar carpeta .git
+            file:
+                state: absent
+                path: "{{ item.documentRoot }}/.git"
+            
+    rescue:
+        -   name: Eliminar lo nuevo que haya puesto hasta ahora
+            file:
+                state: absent
+                path: "{{ item.documentRoot }}"
+        
+        -   name: Restaurar Backup de la app antigua, si existe
+            unarchive:
+                src: /tmp/app.tgz
+                dest: "{{ item.documentRoot }}"
+    always:
+        -   name: Eliminar backup
+            file:
+                state: absent
+                path: /tmp/app.tgz

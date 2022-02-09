@@ -2,9 +2,9 @@
 # apt-repo
 
 -   name: Asegurar que he contactado con los repos al menos una vez para ver que paquetespuedo instalar
-    when: update
     apt:
         update_cache: True
+    when: update
 
 -   name: Asegurar que está instalado unos paquetes
     apt:

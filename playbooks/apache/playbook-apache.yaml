@@ -8,7 +8,7 @@
                 - mandatory
 
         -   name: Instalaciones Previas
-            include_tasks: "tasks/pretasks-{{ ansible_facts['os_family'] }}.yaml"
+            include_tasks: "tasks/pretasks.yaml"
             tags:
                 - pre-instalacion
 

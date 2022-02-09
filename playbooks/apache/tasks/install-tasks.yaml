@@ -9,19 +9,40 @@
         - instalacion
 
 -   name: Asegurar que están instalados los modulos requeridos de apache #modules
-        # {{ item }}
+    apache2_module:
+        #state: present
+        name:  "{{ item }}"
     loop: "{{ apache.modules | default( [] )}}"
     notify: REINICIO_REQUERIDO
     tags:
         - instalacion
         - configuracion
 
-
 -   name: Asegurarme que mi app quede instalada #documentRoot
-        # {{ item }}
+    include_tasks: install.app.yaml
     loop: "{{ apache.virtualhosts | default( [] )}}"
-    notify: REINICIO_REQUERIDO
     tags:
         - instalacion
         - configuracion
 
+# Para qué usamos el playbook?
+# Para dejar un apache con mi configuración y apps
+
+# Cuando vamos a ejecutar el playbook?
+# Instalción vacia (de cero)
+# Cuando haya un cmabio de conf
+# Cuando haya un cambio en la(s) app(s)
+
+# Instalo app nueva.... y falla... DECISION: Dejar la version anterior de la app
+# De donde saco la app? De un git -> 
+
+
+#
+# El repo de git no lo quiero en producción "git clone" Traerme todo el repo ¿quiero esto? lo ultimo
+# me quiero quedar con el historial en el entorno de prod? no 
+# El repo lo extraeré y de él sacaré lo que me interesa ".git"
+# clone -> clone del repo y ya está ahi lo que necesito para instalar
+# Java -> mvn packege -> war, ear.... JENKINS -> ARTEFACTO FINAL -> UN REPO DE ARTEFACTOS (nexus)
+
+
+# La version que tengo... documentRoot -> backup

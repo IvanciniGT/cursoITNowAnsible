@@ -6,7 +6,7 @@ apache:
             documentRoot:   /home/apache/app
             ports:
                             - 80
-            app:            https://github.com/IvanciniGT/webEjemploAnsible
+            appRepo:        https://github.com/IvanciniGT/webEjemploAnsible
     dependencies:           
                             - # Es una dependencia
                                 name: php

@@ -9,7 +9,7 @@
 -   name: Asegurar que están los virtual host que quiero #documentRoot
         # {{ item }}
     template:
-        src: resources/virtualhost.conf
+        src: resources/virtualhost.conf.j2
         dest: "{{ apacheInternals.sitesDir}}"
     loop: "{{ virtualhosts | default( [] ) }}"
     notify: REINICIO_REQUERIDO

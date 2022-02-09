@@ -1,0 +1,31 @@
+-   name: Asegurar que apache quede configurado como yo quiero
+    notify: REINICIO_REQUERIDO
+    tags:
+        - configuracion
+
+-   name: Asegurar que están los virtual host que quiero #documentRoot
+        # {{ item }}
+    loop: "{{ virtualhosts }}"
+    notify: REINICIO_REQUERIDO
+    tags:
+        - configuracion
+    
+-   name: Asegurar que apache tiene su servicio
+    tags:
+        - configuracion
+
+-   name: Asegurar que apache tiene su servicio configurado para arranque automatico
+    tags:
+        - configuracion
+
+-   name: Asegurar que apache tiene su servicio corriendo # START
+    register: estado_servicio # Sustantivo
+    tags:
+        - configuracion
+
+-   name: Asegurar que los puertos del apache quedan abiertos en el firewall local
+        # {{ item.ports }}
+    loop: "{{ virtualhosts }}"
+    tags:
+        - configuracion
+    

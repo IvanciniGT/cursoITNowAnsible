@@ -89,12 +89,16 @@
             setup:
                 gather_subset:
                   - '!all'
+            tags:
+            - instalacion
 
         - # Un item para cada tarea. Y para cada una, tenemos que definir:
             name: Tarea 0. Mostrar lo facts de la maquina contra la que estoy trabajando
             # Decir que módulo ejecuta esta tarea:
             debug:
                 var: ansible_facts 
+            tags:
+            - test
 
 
         - # Un item para cada tarea. Y para cada una, tenemos que definir:
@@ -102,6 +106,8 @@
             # Decir que módulo ejecuta esta tarea:
             debug:
                 msg: Hola, estamos comenzando con Ansible
+            tags:
+            - test
 
         -   name: Tarea 2
             # Decir que módulo ejecuta esta tarea:
@@ -146,6 +152,9 @@
                     {{ item }}
             register: bucle
             loop: "{{ comandos }}"
+            # Antes se hacia con funciones with_X
+            # Para cambiar de sintaxis y ver todos los bucles que podemos montar con loop:
+            # https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html
             vars: 
                 comandos: 
                     - echo HOLA

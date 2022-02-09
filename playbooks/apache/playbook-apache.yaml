@@ -1,0 +1,94 @@
+-   hosts: all
+    gather_facts: False
+
+    pretasks:
+        -   name: Obtener información del entorno # Rellena la variable ansible_facts (MAPA, DICCIONARIO)
+            # Decir que módulo ejecuta esta tarea:
+            setup:
+                gather_subset:
+                  - '!all'
+            tags:
+                - mandatory
+                
+        -   name: Cargar variables internas
+            include_vars:
+                file: internal/internal-vars.yaml
+                name: apacheInternal
+            tags:
+                - mandatory
+                
+        -   name: Cargar variables por defecto
+            include_vars:
+                file: vars/vars.default.yaml
+                name: apache
+            when: apache is not defined
+            tags:
+                - mandatory
+
+        -   name: Instalaciones Previas
+            include_tasks: "tasks/pretasks-{{ ansible_facts['os_family'] }}.yaml"
+            tags:
+                - pre-instalacion
+
+    tasks:                                      
+        -   name: Instalación de apache y mis apps
+            include_tasks: "tasks/install-tasks.yaml"
+            tags:
+                - instalacion
+
+        -   name: Configuración de apache y mis apps
+            include_tasks: "tasks/configure-tasks.yaml"
+            tags:
+                - configuracion
+            
+    posttasks:
+        -   name: Pruebas
+            include_tasks: "tests/tests.yaml"
+            tags:
+                - test
+        
+    handlers:
+        -   name: Asegurar que si hay cambios, el servicio es reiniciado (si no he iniciado con un start)
+            listen: REINICIO_REQUERIDO
+            when: estado_servicio is not changed # Si no he INICIADO el servicio previamente
+            tags:
+                - configuracion
+            
+            
+    # Simulacro de haceresto mismo sin handler
+
+#    pretasks:
+#        -   name: Asegurar que está instalado el software necesario para las apps que ponga en apache # dependencies 
+#    tasks:                                      
+#        -   name: Asegurar que apache quede instalado
+#        -   name: Asegurar que están instalados los modulos requeridos de apache #modules
+#            register: instalacion de modulos
+#        -   name: Asegurar que apache quede configurado como yo quiero
+#            register: configuracion_apache
+#        -   name: Asegurarme que mi app quede instalada #documentRoot
+#            register: instalacion_app
+#        -   name: Asegurar que están los virtual host que quiero #documentRoot
+#            register: virtualhost_configurados
+#        -   name: Tarea nueva que requiere reinicio #documentRoot
+#            register: nueva_tarea
+#        -   name: Asegurar que apache tiene su servicio
+#        -   name: Asegurar que apache tiene su servicio configurado para arranque automatico#
+
+#        -   name: Asegurar que apache tiene su servicio corriendo # START
+#            register: iniciar_servicio
+
+#        -   name: Asegurar que si hay cambios, el servicio es reiniciado (si no he iniciado con un start)
+#            when: >
+#                    iniciar_servicio is not changed and (
+#                        instalacion_modulos is changed or 
+#                        configuracion_apache is changed or 
+#                        instalacion_app is changed or 
+#                        nueva_tarea is changed or 
+#                        virtualhost_configurados is changed
+#                    )
+
+#        -   name: Asegurar que los puertos del apache quedan abiertos en el firewall local
+#    posttasks:
+#        -   name: "Test: Hay corriendo un proceso de apache?"
+#        -   name: "Test: Esta abierto el puerto que quiero?"
+#        -   name: "Test: Puedo acceder a mi app por el protocolo y url adecuado"

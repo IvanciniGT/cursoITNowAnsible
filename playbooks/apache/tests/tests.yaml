@@ -1,0 +1,9 @@
+-   name: "Test: Hay corriendo un proceso de apache?"
+
+-   name: "Test: Esta abierto el puerto que quiero?"
+        # {{ item.ports }}
+    loop: "{{ virtualhosts }}"
+
+-   name: "Test: Puedo acceder a mi app por el protocolo y url adecuado"
+        # {{ item }}
+    loop: "{{ virtualhosts }}"

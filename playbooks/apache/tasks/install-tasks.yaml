@@ -1,10 +1,10 @@
 -   name: Asegurar que apache quede instalado en Debian y derivados # Ian Deborah
-    when: *esDebian
-    tags:
-        - instalacion
-    
--   name: Asegurar que apache quede instalado en Redhat y derivados
-    when: *esRedhat
+    include_tasks: "utils/install.{{ ansible_facts['os_family'] }}.yaml"
+    vars:        
+        packages:
+            - name: httpd
+              version: {{ apache.version }}
+        update: False
     tags:
         - instalacion
 
@@ -24,3 +24,4 @@
     tags:
         - instalacion
         - configuracion
+

@@ -1,0 +1,17 @@
+# apt-key
+# apt-repo
+
+-   name: Asegurar que he contactado con los repos al menos una vez para ver que paquetespuedo instalar
+    when: update
+    apt:
+        update_cache: True
+
+-   name: Asegurar que está instalado unos paquetes
+    apt:
+        name: |
+            {{ item.name }}
+            {%- if item.version is defined and item.version != 'latest' -%}
+                ={{ item.version }}
+            {%- endif -%}
+        state: "{% if item.version == 'latest' -%}     latest     {%- else -%}      present     {%- endif %}"
+    loop: "{{ packages | default( [] ) }}"

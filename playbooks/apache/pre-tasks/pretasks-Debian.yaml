@@ -1,24 +1,15 @@
 -   name: Asegurar que está instalado el software necesario para el playbook en Debian/Ubuntu
-        # {{ item }}
-    loop: "{{ apacheInternal.baseDependecies }}"
-
-# apt-key
-# apt-repo
-
--   name: Asegurar que he contactado con los repos al menos una vez para ver que dependencias / paquetes puedo instalar
-    apt:
-        update_cache: yes
+    include_tasks: "utils/install.{{ ansible_facts['os_family'] }}.yaml"
+    vars:        
+        packages: {{ apacheInternal.baseDependecies }}  
+        update: True
+    tags:
+        - mandatory
 
 -   name: Asegurar que está instalado el software necesario para las apps que ponga en apache
-    apt:
-        name: |
-            {{ item.name }}
-            {%- if item.version is defined and item.version != 'latest' -%}
-                ={{ item.version }}
-            {%- endif -%}
-        state: "{% if item.version == 'latest' -%}     latest     {%- else -%}      present     {%- endif %}"
-    when: item.version is defined
-    loop: "{{ apache.dependencies | default( [] ) }}"
-
-
-apt install git
+    include_tasks: "utils/install.{{ ansible_facts['os_family'] }}.yaml"
+    vars:        
+        packages: {{ apache.dependencies }}
+        update: False
+    tags:
+        - pre-instalacion

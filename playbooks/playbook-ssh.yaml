@@ -5,27 +5,48 @@
     # Esto es por defecto
     gather_facts: False
     #...
+    vars:
+        generateIfNotExists: True # A nivel de inventario... en cada maquina o grupo
+        regenetateIfChanged: True
     
     # Cómo se sacan los gather_facts? Internamente... cual es el procedimiento?
     tasks:
-        -   name: Asegurar entrada en el fichero known_hosts para un host remoto
-            #connection: local
-            #local_action: |
-            #    shell ssh-keygen -F {{ inventory_hostname }}
+        -   name: Consultar si el host está en known_hosts
             delegate_to: localhost
             shell: 
                 cmd: |
-                    ssh-keygen -F {{ ansible_host }} && echo "OK" || ssh-keyscan -H {{ ansible_host }} >> ~/.ssh/known_hosts
+                    ssh-keygen -F {{ ansible_host }}
             when: ansible_connection == 'ssh'
             register: entrada_existente
-            changed_when: "'OK' not in entrada_existente.stdout"
+            changed_when: False
+            failed_when: False
+        
+        -   name: "Debugging"
+            debug:
+                msg: "{{ entrada_existente }}"
+                
+        -   name: El host no existe en known_hosts
+            block:  
+                -   name: Abortar si no lo tengo que crear
+                    delegate_to: localhost
+                    debug:
+                        msg: "El host: {{ inventory_hostname }} ({{ ansible_host }}), no está dado de alta en known_hosts. Abortando."
+                    failed_when: True
+                    when: not generateIfNotExists
+                    
+                # Si llego a este punto, que significa? Tengo que crearla
+                -   name: Creamos entrada en known_hosts
+                    delegate_to: localhost
+                    shell: ssh-keyscan -H {{ ansible_host }} >> ~/.ssh/known_hosts
+
+            when: entrada_existente.rc is defined and entrada_existente.rc != 0
+
+        -   name: El host si existe en known_hosts
+            block:  
+                # Comprobar si el valor me encaja con el actual
+            when: entrada_existente.rc is defined and entrada_existente.rc == 0
             
-        -   name: Comprobar que funciona
-            # Decir que módulo ejecuta esta tarea:
-            setup:
-                gather_subset:
-                  - '!all'
-    
+            # meta: end_play. Aborta el play
     # 1º Comprobar si está:
         # 2º Si lo que hay es lo mismo que lo que deberia tener
                 # 3ª Si lo es... TODO OK. NADA. changed: NO
@@ -38,11 +59,13 @@
                                 # Eliminar la vieja
                                 # ssh-keygen -R {{ ansible_host }} 
                                 # Poner la nueva
-    # 2º Si no está
-        # Puede ser normal o no? Al menos debería avisar de alguna forma 
-            # En funcion de una variable genero o no
-                # Si no genero? ERROR
-                # Si genero:
-                    # Poner la nueva
+
     
     # MONTARLO Y CONVERTIRLO EN UN ROLE
+    
+    
+        -   name: Comprobación
+            setup:
+                gather_subset:
+                  - '!all'
+    

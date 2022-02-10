@@ -1,0 +1,11 @@
+
+-   name: Asegurar que está instalado unos paquetes
+    yum:
+        name: |
+            {{ item.name }}
+            {%- if item.version is defined and item.version != 'latest' -%}
+                -{{ item.version }}
+            {%- endif -%}
+        state: "{% if item.version == 'latest' -%}     latest     {%- else -%}      present     {%- endif %}"
+        update_cache: "{{ update }}"
+    loop: "{{ packages | default( [] ) }}"

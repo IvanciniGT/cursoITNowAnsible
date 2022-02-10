@@ -1,0 +1,29 @@
+"salida_tarea_2": {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python"
+    }, 
+    "changed": false, 
+    "cmd": "mkdir /tmp/prueba", 
+    "delta": "0:00:00.497831", 
+    "deprecations": [
+        {
+            "msg": "Distribution Ubuntu 18.04 on host mipc should use /usr/bin/python3, but is using /usr/bin/python for backward compatibility with prior Ansible releases. A future Ansible release will default to using the discovered platform python for this host. See https://docs.ansible.com/ansible/2.9/reference_appendices/interpreter_discovery.html for more information", 
+            "version": "2.12"
+        }
+    ], 
+    "end": "2022-02-08 11:52:53.549706", 
+    "failed": false, 
+    "failed_when_result": false, 
+    "msg": "non-zero return code", 
+    "rc": 1, 
+    "start": "2022-02-08 11:52:53.051875", 
+    "stderr": "mkdir: cannot create directory ‘/tmp/prueba’: File exists", 
+    "stderr_lines": [
+        "mkdir: cannot create directory ‘/tmp/prueba’: File exists"
+    ], 
+    "stdout": "", 
+    "stdout_lines": [], 
+    "warnings": [
+        "Consider using the file module with state=directory rather than running 'mkdir'.  If you need to use command because file is insufficient you can add 'warn: false' to this command task or set 'command_warnings=False' in ansible.cfg to get rid of this message."
+    ]
+}

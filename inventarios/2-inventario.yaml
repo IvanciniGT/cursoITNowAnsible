@@ -1,0 +1,37 @@
+all:
+    hosts:
+        mipc:
+            ansible_host: localhost
+            ansible_connection: local
+
+    children:
+        webservers:
+            hosts:
+                remoto.ubuntu:
+                    ansible_host: 172.21.0.2
+                    ansible_connection: ssh
+                    ansible_user: alumno
+                    ansible_port: 22
+                    regenetateIfChanged: False
+            vars:
+                generateIfNotExists: True
+                regenetateIfChanged: True
+                ansible_ssh_private_key_file: /home/ubuntu/environment/claves/privateKey
+                ansible_python_interpreter: /usr/bin/python3
+                apache:                 
+                    version:                latest
+                    user:                   apache
+                    virtualhosts:           
+                        -   appName:        app1
+                            domain:         localhost
+                            documentRoot:   /home/apache/app
+                            ports:
+                                            - 80
+                            appRepo:        https://github.com/IvanciniGT/webEjemploAnsible
+                    dependencies:           
+                                            -   name: php
+                                                version: latest
+                                            -   name: git
+                                                version: 2.17.1
+                    modules:                
+                                            - mod_php

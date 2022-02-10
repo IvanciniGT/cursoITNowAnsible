@@ -15,15 +15,12 @@
             delegate_to: localhost
             shell: 
                 cmd: |
-                    ssh-keygen -F {{ ansible_host }}
+                    ssh-keygen -F {{ ansible_host }} | grep ssh-rsa | sed 's/.* //' 
             when: ansible_connection == 'ssh'
             register: entrada_existente
             changed_when: False
             failed_when: False
         
-        -   name: "Debugging"
-            debug:
-                msg: "{{ entrada_existente }}"
                 
         -   name: El host no existe en known_hosts
             block:  
@@ -39,12 +36,51 @@
                     delegate_to: localhost
                     shell: ssh-keyscan -H {{ ansible_host }} >> ~/.ssh/known_hosts
 
-            when: entrada_existente.rc is defined and entrada_existente.rc != 0
+            when: entrada_existente.rc is defined and entrada_existente.stdout | length == 0
 
         -   name: El host si existe en known_hosts
             block:  
                 # Comprobar si el valor me encaja con el actual
-            when: entrada_existente.rc is defined and entrada_existente.rc == 0
+                -   name: Obtener el valor actual del host
+                    delegate_to: localhost
+                    shell: 
+                        cmd: |
+                            ssh-keyscan -H {{ ansible_host }} 2> /dev/null | grep ssh-rsa | sed 's/.* //' 
+                            # ssh-keyscan -p 22 -t rsa {{ ansible_host }} 2>/dev/null | sed -E 's/^([^ \[]+) (.*)$/[\1]:22 \2/'
+                    register: entrada_actual
+                    changed_when: False
+                    failed_when: False
+                        
+                -   name: "Debugging existente"
+                    debug:
+                        msg: "{{ entrada_existente.stdout }}"
+                        
+                -   name: "Debugging actual"
+                    debug:
+                        msg: "{{ entrada_actual.stdout }}"
+                
+                -   name: Seguir adelante si coinciden 
+                    delegate_to: localhost
+                    debug:
+                        msg: "El host: {{ inventory_hostname }} ({{ ansible_host }}), está registrado en known_hosts."
+                    changed_when: False
+                    when: entrada_existente.stdout == entrada_actual.stdout
+                    
+                -   name: Abortar si no coinciden y no tengo que regenerarla
+                    delegate_to: localhost
+                    debug:
+                        msg: "El host: {{ inventory_hostname }} ({{ ansible_host }}), ha cambiado su huella con respecto a la anotada en known_hosts. Abortando."
+                    failed_when: True
+                    when: entrada_existente.stdout != entrada_actual.stdout and not regenetateIfChanged 
+
+                -   name: Creamos entrada en known_hosts, remplazando la existente
+                    delegate_to: localhost
+                    shell: >
+                        ssh-keygen -R {{ ansible_host }} &&
+                        ssh-keyscan -H {{ ansible_host }} >> ~/.ssh/known_hosts
+                    when: entrada_existente.stdout != entrada_actual.stdout and regenetateIfChanged 
+                
+            when: entrada_existente.rc is defined and entrada_existente.stdout | length != 0
             
             # meta: end_play. Aborta el play
     # 1º Comprobar si está:

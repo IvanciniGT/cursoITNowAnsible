@@ -2,7 +2,8 @@ apache:
     version:                latest
     user:                   apache
     virtualhosts:           
-        -   domain:         localhost
+        -   appName:        app1
+            domain:         localhost
             documentRoot:   /home/apache/app
             ports:
                             - 80

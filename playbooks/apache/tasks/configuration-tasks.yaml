@@ -1,8 +1,8 @@
 -   name: Asegurar que apache quede configurado como yo quiero
     notify: REINICIO_REQUERIDO
     copy:
-        src: resources/httpd.conf
-        dest: "{{ apacheInternals.etcDir}}"
+        src: resources/httpd.conf                          # Ruta del host donde se ejecuta ansible
+        dest: "{{ apacheInternals.etcDir }}/httpd.conf"    # Ruta del host contra el que se ejecuta ansible
     tags:
         - configuracion
 
@@ -10,7 +10,7 @@
         # {{ item }}
     template:
         src: resources/virtualhost.conf.j2
-        dest: "{{ apacheInternals.sitesDir}}"
+        dest: "{{ apacheInternals.sitesDir }}/{{ item.appName }}.conf"
     loop: "{{ virtualhosts | default( [] ) }}"
     notify: REINICIO_REQUERIDO
     tags:

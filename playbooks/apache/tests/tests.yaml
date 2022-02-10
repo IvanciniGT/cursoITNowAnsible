@@ -1,9 +1,14 @@
 -   name: "Test: Hay corriendo un proceso de apache?"
+    debug:
+        msg: "Test: Hay corriendo un proceso de apache?"
 
 -   name: "Test: Esta abierto el puerto que quiero?"
-        # {{ item.ports }}
+    debug:
+        msg: "Test: Esta abierto el puerto que quiero? {{ item.ports }}"
+        
     loop: "{{ virtualhosts }}"
 
 -   name: "Test: Puedo acceder a mi app por el protocolo y url adecuado"
-        # {{ item }}
+    debug:
+        msg: "Test: Puedo acceder a mi app por el protocolo y url adecuado? {{ item.appName }}"
     loop: "{{ virtualhosts }}"

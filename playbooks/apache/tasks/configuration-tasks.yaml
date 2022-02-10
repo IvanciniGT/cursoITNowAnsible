@@ -16,21 +16,38 @@
     tags:
         - configuracion
     
--   name: Asegurar que apache tiene su servicio
-    tags:
-        - configuracion
+    # Comprobar si hay servicio... Si no lo hay crearlo
+#-   name: Asegurar que apache tiene su servicio
+#    shell:
+#        system status 
+#    register: servicio_apache
+#    ignore_errors: True             # Funcionaría?  SI.  Problema?  La tarea se mostraría como FAILED
+#    failed_when: False              # Problema? No da failed... y lo de abajo no cuela.
+#    tags:
+#        - configuracion
+        
+#-   name: Crear servicio si no existe
+#    # copy | template
+#    when: servicio_apache is failed
 
--   name: Asegurar que apache tiene su servicio configurado para arranque automatico
-    tags:
-        - configuracion
-
--   name: Asegurar que apache tiene su servicio corriendo # START
+-   name: Asegurar que apache tiene su servicio corriendo y configurado para arranque automatico
+    systemd:
+        name: httpd
+        state: started
+        enabled: True
     register: estado_servicio # Sustantivo
     tags:
         - configuracion
 
 -   name: Asegurar que los puertos del apache quedan abiertos en el firewall local
+    debug:
+        msg: "Abro puerto {{ item.ports }} si no lo está, con el firewall adecuado"
         # {{ item.ports }}
+        # TRUCO !!!!!!!
+    # Lo que queremos es abrir los puertos si no están.
+    # Cómo se abren puertos en un Redhat? firewalld
+    # Cómo se abren puertos en un Ubuntu? ufw
+    
     loop: "{{ virtualhosts | default( [] ) }}"
     tags:
         - configuracion

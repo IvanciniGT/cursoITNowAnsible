@@ -3,9 +3,23 @@
     # Entornos en los que voy a ejectar este playbook
     hosts: all # mipc localhost
     # Esto es por defecto
-    # gather_facts: True
+    gather_facts: False
     #...
+    
+    # Cómo se sacan los gather_facts? Internamente... cual es el procedimiento?
     tasks:
+        -   name: Asegurar entrada en el fichero known_hosts para un host remoto
+            #connection: local
+            #local_action: |
+            #    shell ssh-keygen -F {{ inventory_hostname }}
+            delegate_to: localhost
+            shell: 
+                cmd: |
+                    ssh-keygen -F {{ ansible_host }} && echo "OK" || ssh-keyscan -H {{ ansible_host }} >> ~/.ssh/known_hosts
+            when: ansible_connection == 'ssh'
+            register: entrada_existente
+            changed_when: "'OK' not in entrada_existente.stdout"
+            
         - # Un item para cada tarea. Y para cada una, tenemos que definir:
             name: Soy la primera tarea del playbook
             # Decir que módulo ejecuta esta tarea:

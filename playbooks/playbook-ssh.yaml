@@ -1,0 +1,48 @@
+# Playbook
+-
+    # Entornos en los que voy a ejectar este playbook
+    hosts: all # mipc localhost
+    # Esto es por defecto
+    gather_facts: False
+    #...
+    
+    # Cómo se sacan los gather_facts? Internamente... cual es el procedimiento?
+    tasks:
+        -   name: Asegurar entrada en el fichero known_hosts para un host remoto
+            #connection: local
+            #local_action: |
+            #    shell ssh-keygen -F {{ inventory_hostname }}
+            delegate_to: localhost
+            shell: 
+                cmd: |
+                    ssh-keygen -F {{ ansible_host }} && echo "OK" || ssh-keyscan -H {{ ansible_host }} >> ~/.ssh/known_hosts
+            when: ansible_connection == 'ssh'
+            register: entrada_existente
+            changed_when: "'OK' not in entrada_existente.stdout"
+            
+        -   name: Comprobar que funciona
+            # Decir que módulo ejecuta esta tarea:
+            setup:
+                gather_subset:
+                  - '!all'
+    
+    # 1º Comprobar si está:
+        # 2º Si lo que hay es lo mismo que lo que deberia tener
+                # 3ª Si lo es... TODO OK. NADA. changed: NO
+                # 4º Si no lo es? 
+                    # AQUI HA PASADO ALGO? 
+                        # Puede ser normal o no? Al menos debería avisar de alguna forma
+                        # En funcion de una variable regenero o no
+                            # Si no regenero? ERROR
+                            # Si regenero:
+                                # Eliminar la vieja
+                                # ssh-keygen -R {{ ansible_host }} 
+                                # Poner la nueva
+    # 2º Si no está
+        # Puede ser normal o no? Al menos debería avisar de alguna forma 
+            # En funcion de una variable genero o no
+                # Si no genero? ERROR
+                # Si genero:
+                    # Poner la nueva
+    
+    # MONTARLO Y CONVERTIRLO EN UN ROLE

@@ -43,7 +43,10 @@ ssh-keyscan -H hostname.    genera la huella para darlo de alta en el fichero ~/
 
 
 
+Al trabajar via ssh con claves:
+El servidor al que me conecto me identifica por mi clave 
 
+Siempre necesito autenticación: contraseña / clave publica/privada
     
     
     

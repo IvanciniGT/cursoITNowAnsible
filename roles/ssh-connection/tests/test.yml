@@ -1,0 +1,15 @@
+---
+- hosts: all
+  gather_facts: False
+  tasks:
+    -   name: Asegurar conexión ssh
+        include_role: 
+          name: ssh-connection
+        vars:
+          generateIfNotExists: True
+          regenetateIfChanged: True
+    
+    -   name: Comprobación
+        setup:
+            gather_subset:
+              - '!all'

@@ -1,0 +1,4 @@
+---
+# Variables que quiero que me modifiquen
+generateIfNotExists: True
+regenetateIfChanged: True

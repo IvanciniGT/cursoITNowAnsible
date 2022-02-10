@@ -96,10 +96,6 @@
                                 # ssh-keygen -R {{ ansible_host }} 
                                 # Poner la nueva
 
-    
-    # MONTARLO Y CONVERTIRLO EN UN ROLE
-    
-    
         -   name: Comprobación
             setup:
                 gather_subset:

@@ -1,7 +1,17 @@
 -   hosts: all
     gather_facts: False
 
-    pretasks:
+    pre_tasks:
+    
+        -   name: Asegurar conexión ssh
+            include_role: 
+              name: ../../roles/ssh-connection
+            vars:
+              generateIfNotExists: True
+              regenetateIfChanged: True
+            tags: 
+                - prueba
+---              
         -   name: Preparación del playbook
             include_tasks: "pre-tasks/base.yaml"
             tags:
@@ -23,7 +33,7 @@
             tags:
                 - configuracion
             
-    posttasks:
+    post_tasks:
         -   name: Pruebas
             include_tasks: "tests/tests.yaml"
             tags:
@@ -31,6 +41,8 @@
         
     handlers:
         -   name: Asegurar que si hay cambios, el servicio es reiniciado (si no he iniciado con un start)
+            debug:
+                msg: "Reiniciando"
             listen: REINICIO_REQUERIDO
             when: estado_servicio is not changed # Si no he INICIADO el servicio previamente
             tags:

@@ -10,15 +10,15 @@
               generateIfNotExists: True
               regenetateIfChanged: True
             tags: 
-                - prueba
----              
+                - mandatory
+
         -   name: Preparación del playbook
             include_tasks: "pre-tasks/base.yaml"
             tags:
                 - mandatory
 
         -   name: Instalaciones Previas
-            include_tasks: "tasks/pretasks.yaml"
+            include_tasks: "pre-tasks/pretasks.yaml"
             tags:
                 - pre-instalacion
 

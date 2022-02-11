@@ -1,0 +1,5 @@
+#ansible_host: 172.21.0.2
+ansible_connection: ssh
+ansible_user: alumno
+ansible_port: 22
+regenetateIfChanged: False

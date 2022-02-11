@@ -2,26 +2,11 @@
     gather_facts: False
 
     pre_tasks:
-    
-        -   name: Asegurar conexión ssh
-            include_role: 
-              name: ../../roles/ssh-connection
-            vars:
-              generateIfNotExists: True
-              regenetateIfChanged: True
-            tags: 
-                - mandatory
-
-        -   name: Preparación del playbook
-            include_tasks: "pre-tasks/base.yaml"
+        -   name: Instalación de apache y mis apps
+            include_tasks: "pre-tasks/main.yaml"
             tags:
-                - mandatory
-
-        -   name: Instalaciones Previas
-            include_tasks: "pre-tasks/pretasks.yaml"
-            tags:
-                - pre-instalacion
-
+                - instalacion
+                
     tasks:                                      
         -   name: Instalación de apache y mis apps
             include_tasks: "tasks/install-tasks.yaml"

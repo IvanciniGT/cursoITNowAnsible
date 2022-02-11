@@ -1,0 +1,15 @@
+
+-   name: Asegurar conectividad
+    include_tasks: "pre-tasks/conectividad.yaml"
+    tags:
+        - mandatory
+
+-   name: Preparación del playbook
+    include_tasks: "pre-tasks/variables.yaml"
+    tags:
+        - mandatory
+
+-   name: Instalaciones Previas
+    include_tasks: "pre-tasks/preinstalaciones.yaml"
+    tags:
+        - pre-instalacion

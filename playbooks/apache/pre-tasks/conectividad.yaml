@@ -1,0 +1,8 @@
+-   name: Asegurar conexión ssh
+    include_role: 
+      name: ../../roles/ssh-connection
+    vars:
+      generateIfNotExists: True
+      regenetateIfChanged: True
+    tags: 
+        - mandatory

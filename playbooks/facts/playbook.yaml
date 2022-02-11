@@ -1,0 +1,146 @@
+-   hosts: localhost
+    gather_facts: True
+    vars:
+        nombre: Iván
+        saludo: Estimado
+        usuario:
+            nombre: Ivan
+            edad: 43
+        servidores:
+            - nginx
+            - apache
+            
+        servidores_con_puerto:
+            nginx:
+                puerto: 80
+            apache:
+                puerto: 81
+            
+        servidores_con_puertos:
+            nginx:
+                puertos: 
+                    - 80
+                    - 443
+            apache:
+                puertos: 
+                    - 81
+                    - 444
+    
+    tasks:
+        -   name: Trabajando con variables 
+            tags:
+                - variables
+            block:
+                -   name: Definir una variable dinámicamente. Sintaxis 1
+                    set_fact: saludo="Hola"
+        
+                -   name: Definir una variable dinámicamente. Sintaxis 2
+                    set_fact: 
+                        despedida: Adios
+                        frase: "{{ saludo }} {{ nombre }}!!!"
+                
+                -   name: Comprobación ansible_facts < gather_facts:true
+                    debug:
+                        msg: "{{ ansible_facts }}"
+                        
+                -   name: Comprobación mi variable dinámica
+                    debug:
+                        msg: |
+                            {{ nombre }}
+                            {{ saludo }}
+                            {{ despedida }}
+                            {{ frase }}
+                        
+                -   name: Cumpleaños de Ivan 
+                    # No se puede editar un diccionario. 
+                    # Hay que recrearlo.
+                    set_fact: 
+                        usuario: # RUINA GRANDE !!!
+                            nombre: "{{ usuario.nombre }}"
+                            edad: "{{ usuario.edad + 1 }}"
+                        usuario: "{{ usuario | combine( {'edad': usuario.edad + 1 } ) }}"
+        
+                -   name: Comprobación de mi edad
+                    debug:
+                        msg: "{{ usuario.edad }}"
+                        
+                -   name: Instalar un servidor
+                    debug:
+                        msg: "Ejecuto el programa que instala el servidor: {{ item }}"
+                    loop: "{{ servidores }}"
+                    
+                -   name: Instalar un servidor en su puerto
+                    debug:
+                        msg: |
+                             Ejecuto el programa que instala el servidor: 
+                             NOMBRE: {{ item.key }}
+                             PUERTO: {{ item.value.puerto }}"
+                    loop: "{{ servidores_con_puerto | dict2items }}"
+                       
+                -   name: Instalar un servidor en sus puertos
+                    debug:
+                        msg: |
+                             Ejecuto el programa que instala el servidor: 
+                             NOMBRE: {{ item.0.key }}
+                             PUERTO: {{ item.1 }}"
+                    loop: "{{ servidores_con_puertos | dict2items | subelements('value.puertos') }}"
+                    #https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html#migrating-from-with-x-to-loop
+            
+        # Generar un custom fact en el REMOTO
+        -   name: Generando Custom Facts
+            block:
+                -   name: Asegurarme que tengo la carpeta de custom facts
+                    file: 
+                        path:   /etc/ansible/facts.d
+                        state:  directory
+                    become: True
+
+                -   name: Asegurarme que tengo el custom file
+                    copy: 
+                        src:    custom1.json
+                        dest:   /etc/ansible/facts.d/custom1.fact
+                        mode:   0664
+                    become: True
+
+                -   name: Asegurarme que tengo el custom file2
+                    template: 
+                        src:    custom2.json.j2
+                        dest:   /etc/ansible/facts.d/custom2.fact
+                        mode:   0664
+                    vars:
+                        dato1: Hola
+                        dato2: amigo !!!
+                    become: True
+
+                -   name: Asegurarme que tengo el custom file
+                    copy: 
+                        src:    custom3.sh
+                        dest:   /etc/ansible/facts.d/custom3.fact
+                        mode:   0777
+                    become: True
+
+
+                -   name: Asegurarme que tengo el custom file
+                    copy: 
+                        src:    custom4.py
+                        dest:   /etc/ansible/facts.d/custom4.fact
+                        mode:   0777
+                    become: True
+
+
+            tags:
+                - generar
+        # Recuperar un custom fact
+        -   name: Consultado Custom Facts
+            block:
+                -   name: Leyendo custom facts
+                    debug:
+                        var: ansible_facts.ansible_local
+                -   name: Leyendo custom fact
+                    debug:
+                        msg: | 
+                            {{ ansible_local }}
+                            {{ ansible_local.custom1 }}
+                            {{ ansible_local.custom1.dato1 }}
+            tags:
+                - custom
